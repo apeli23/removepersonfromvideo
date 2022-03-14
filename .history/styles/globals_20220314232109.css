@@ -1,0 +1,33 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: #081933;
+  color: #FFFF;
+  text-align: center;
+    object-fit: cover;
+    align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+.container{
+  over
+}
+.row{
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  border: 3px solid rgb(0, 0, 0);
+  text-align: center;
+  padding: 10px;
+  margin: 50px;
+}
