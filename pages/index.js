@@ -18,6 +18,7 @@ export default function Home() {
   const videoDownloadRef = useRef();
   const [model, setModel] = useState(null);
   const [link, setLink] = useState("");
+  const [blob, setBlob] = useState();
 
   const segmentationConfig = {
     internalResolution: "full",
@@ -28,6 +29,7 @@ export default function Home() {
   };
 
   useEffect(() => {
+    // video = document.getElementById('video');
     if (model) return;
     const start_time = Date.now() / 1000;
 
@@ -54,24 +56,10 @@ export default function Home() {
 
   }
 
-  const stopCamHandler = () => {
+  const stopVideo = () => {
     console.log("Hanging up the call ...");
-    localStream.getTracks().forEach((track) => track.stop());
-
-    mediaRecorder.onstop = async (event) => {
-      let blob = new Blob(recordedChunks, {
-        type: "video/webm",
-      });
-
-      // Save original video to cloudinary
-      await readFile(blob).then((encoded_file) => {
-        uploadVideo(encoded_file);
-      });
-
-      videoDownloadRef.current.href = URL.createObjectURL(blob);
-      videoDownloadRef.current.download =
-        new Date().getTime() + "-locastream.webm";
-    };
+    console.log(blob)
+    
   };
 
   function readFile(file) {
@@ -93,18 +81,22 @@ export default function Home() {
 
   const uploadVideo = async (base64) => {
     console.log("uploading to backend...");
-    try {
-      fetch("/api/upload", {
-        method: "POST",
-        body: JSON.stringify({ data: base64 }),
-        headers: { "Content-Type": "application/json" },
-      }).then((response) => response.json())
-        .then((data) => {
-          setLink(data.data);
-        });
-    } catch (error) {
-      console.error(error);
-    }
+    await readFile(blob).then((encoded_file) => {
+      console.log(encoded_file );
+      try {
+        fetch('/api/upload', {
+          method: 'POST',
+          body: JSON.stringify({ data: encoded_file }),
+          headers: { 'Content-Type': 'application/json' },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setLink(data.data);
+          });
+      } catch (error) {
+        console.error(error);
+      }
+    });
   };
 
   let transform = () => {
@@ -122,7 +114,7 @@ export default function Home() {
   };
 
   let computeFrame = () => {
-    console.log(video_in.videoWidth)
+    // console.log(video_in.videoWidth)
     ctx_tmp.drawImage(
       video_in,
       0,
@@ -159,8 +151,16 @@ export default function Home() {
       }
       // console.log(segmentation);
       ctx_out.putImageData(output_img, 0, 0);
-      setTimeout(computeFrame, 30);
+      setTimeout (computeFrame, 0);
     });
+    const chunks = [];
+    const cnv = processedVid.current;
+    const stream = cnv.captureStream();
+    const rec = new MediaRecorder(stream);
+    rec.ondataavailable = e => chunks.push(e.data);
+    rec.onstop = e => setBlob(new Blob(chunks, { type: 'video/webm' }));
+    rec.start();
+    setTimeout(() => rec.stop(), 10000);
   };
 
   return (
@@ -174,6 +174,7 @@ export default function Home() {
         <div className="row">
           <div className="column">
             <video
+            id="video"
               width="800px"
               src="sample.mp4"
               autoPlay
@@ -190,7 +191,10 @@ export default function Home() {
           <button className="button" ref={startBtn} onClick={startVideo}>
             Process Video
           </button>
-          <button className="button"  >
+          <button className="button" ref={startBtn} onClick={stopVideo}>
+           Stop and upload
+          </button>
+          <button className="button" onClick={uploadVideo}>
             <a ref={videoDownloadRef}>
               Get Copy
             </a>
