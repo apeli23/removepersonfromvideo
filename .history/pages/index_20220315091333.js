@@ -59,7 +59,7 @@ export default function Home() {
   const stopVideo = () => {
     console.log("Hanging up the call ...");
     console.log(blob)
-
+    
   };
 
   function readFile(file) {
@@ -82,7 +82,7 @@ export default function Home() {
   const uploadVideo = async (base64) => {
     console.log("uploading to backend...");
     await readFile(blob).then((encoded_file) => {
-      console.log(encoded_file);
+      console.log(encoded_file );
       try {
         fetch('/api/upload', {
           method: 'POST',
@@ -151,7 +151,7 @@ export default function Home() {
       }
       // console.log(segmentation);
       ctx_out.putImageData(output_img, 0, 0);
-      setTimeout(computeFrame, 0);
+      setTimeout (computeFrame, 0);
     });
     const chunks = [];
     const cnv = processedVid.current;
@@ -174,7 +174,7 @@ export default function Home() {
         <div className="row">
           <div className="column">
             <video
-              id="video"
+            id="video"
               width="800px"
               src="sample.mp4"
               autoPlay
@@ -183,12 +183,8 @@ export default function Home() {
             />
           </div>
           <div className="column">
-            {link ?
-              <h4><a href={link}>Get Copy</a></h4>
-              :
-              <img id="loading" width="50" height="30" src="https://mir-s3-cdn-cf.behance.net/project_modules/disp/f1055231234507.564a1d234bfb6.gif" />
-            }
-            <br />
+            {link?
+            <h4><a href={link}>Get Copy</a></h4>: }<br />
             <canvas className="display" width={800} height={450} ref={processedVid}></canvas>
           </div>
         </div>
@@ -196,10 +192,12 @@ export default function Home() {
           <button className="button" ref={startBtn} onClick={startVideo}>
             Process Video
           </button>
-          
+          <button className="button" ref={startBtn} onClick={stopVideo}>
+           Stop and upload
+          </button>
           <button className="button" onClick={uploadVideo}>
             <a ref={videoDownloadRef}>
-              Stop and upload
+              Get Copy
             </a>
           </button>
         </div>

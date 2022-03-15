@@ -199,7 +199,7 @@ export default function Home() {
           
           <button className="button" onClick={uploadVideo}>
             <a ref={videoDownloadRef}>
-              Stop and upload
+              Get Copy
             </a>
           </button>
         </div>

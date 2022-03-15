@@ -74,8 +74,6 @@ button {
   height: 60px;
   align-items: center;
   text-align: center;
-  margin-left: 2%;
-  margin-top: 2%;
 }
 button:hover {
   transform: translateY(-3px);

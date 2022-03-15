@@ -196,10 +196,12 @@ export default function Home() {
           <button className="button" ref={startBtn} onClick={startVideo}>
             Process Video
           </button>
-          
+          <button className="button" ref={startBtn} onClick={stopVideo}>
+            Stop and upload
+          </button>
           <button className="button" onClick={uploadVideo}>
             <a ref={videoDownloadRef}>
-              Stop and upload
+              Get Copy
             </a>
           </button>
         </div>

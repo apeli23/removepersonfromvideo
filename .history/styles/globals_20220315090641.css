@@ -63,23 +63,19 @@ canvas {
 }
  
 button {
-  padding: 15px;
-  color: #7B7B7B;
-  background-color: #FFF;
-  border-radius: 1rem;
-  border: 1px solid;
-  font-size: 20px;
-  font-weight: 300;
   width: 300px;
-  height: 60px;
-  align-items: center;
-  text-align: center;
-  margin-left: 2%;
-  margin-top: 2%;
+    height: 60px;
+    padding: 20px;
+    font-size: 20px;
+    color: white;
+    background-color: #AE2424;
+    border-radius: 1rem;
+    border: 0px;
+    marh
 }
-button:hover {
+button :hover {
   transform: translateY(-3px);
   transition: 1s;
-  box-shadow: 0 10px 20px rgba(166,173,201,0.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
  
