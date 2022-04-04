@@ -9,7 +9,7 @@ const modelConfig = {
   quantBytes: 4,
 };
 export default function Home() {
-  let ctx_out, video_in, ctx_tmp, c_tmp, c_out, test;
+  let outputContext, inputVideo, temporaryContext, temporaryCanvas, outputCanvas;
 
   const processedVid = useRef();
   const rawVideo = useRef();
@@ -24,76 +24,67 @@ export default function Home() {
     internalResolution: "full",
     segmentationThreshold: 0.1,
     scoreThreshold: 0.4,
-    flipHorizontal: true,
-    maxDetections: 1,
   };
 
   useEffect(() => {
-    
     if (model) return;
-    const start_time = Date.now() / 1000;
-
     bodyPix.load(modelConfig).then((m) => {
       setModel(m);
-      const end_time = Date.now() / 1000;
-      console.log(`model loaded successfully, ${end_time - start_time}`);
     });
   }, []);
 
   const startVideo = async () => {
     console.log("playing video...")
     rawVideo.current.play()
-    video_in = rawVideo.current;
+    inputVideo = rawVideo.current;
     await rawVideo.current.play().then(() => {
       transform()
       console.log("object")
     })
-
-
   }
 
   let transform = () => {
     // let ;
-    c_out = processedVid.current;
-    ctx_out = c_out.getContext("2d");
+    outputCanvas = processedVid.current;
+    outputContext = outputCanvas.getContext("2d");
 
-    c_tmp = document.createElement("canvas");
-    c_tmp.setAttribute("width", 800);
-    c_tmp.setAttribute("height", 450);
+    temporaryCanvas = document.createElement("canvas");
+    temporaryCanvas.setAttribute("width", 800);
+    temporaryCanvas.setAttribute("height", 450);
 
-    ctx_tmp = c_tmp.getContext("2d");
+    temporaryContext = temporaryCanvas.getContext("2d");
 
     computeFrame();
   };
 
   let computeFrame = () => {
-    // console.log(video_in.videoWidth)
-    ctx_tmp.drawImage(
-      video_in,
+    // console.log(inputVideo.videoWidth)
+    temporaryContext.drawImage(
+      inputVideo,
       0,
       0,
-      video_in.videoWidth,
-      video_in.videoHeight
+      inputVideo.videoWidth,
+      inputVideo.videoHeight
     );
 
-    let frame = ctx_tmp.getImageData(
+    let frame = temporaryContext.getImageData(
       0,
       0,
-      video_in.videoWidth,
-      video_in.videoHeight
+      inputVideo.videoWidth,
+      inputVideo.videoHeight
     );
 
     model.segmentPerson(frame, segmentationConfig).then((segmentation) => {
-      let output_img = ctx_out.getImageData(
+      let output_img = outputContext.getImageData(
         0,
         0,
-        video_in.videoWidth,
-        video_in.videoHeight
+        inputVideo.videoWidth,
+        inputVideo.videoHeight
       );
 
-      for (let x = 0; x < video_in.videoWidth; x++) {
-        for (let y = 0; y < video_in.videoHeight; y++) {
-          let n = x + y * video_in.videoWidth;
+      for (let x = 0; x < inputVideo.videoWidth; x++) {
+        for (let y = 0; y < inputVideo.videoHeight; y++) {
+          let n = x + y * inputVideo.videoWidth;
           if (segmentation.data[n] == 0) {
             output_img.data[n * 4] = frame.data[n * 4]; // R
             output_img.data[n * 4 + 1] = frame.data[n * 4 + 1]; // G
@@ -103,7 +94,7 @@ export default function Home() {
         }
       }
       // console.log(segmentation);
-      ctx_out.putImageData(output_img, 0, 0);
+      outputContext.putImageData(output_img, 0, 0);
       setTimeout(computeFrame, 0);
     });
     const chunks = [];
