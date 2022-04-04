@@ -29,7 +29,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // video = document.getElementById('video');
+    
     if (model) return;
     const start_time = Date.now() / 1000;
 
@@ -40,64 +40,17 @@ export default function Home() {
     });
   }, []);
 
-  let recordedChunks = [];
-  let localStream = null;
-  let options = { mimeType: "video/webm; codecs=vp9" };
-  let mediaRecorder = null;
-  let videoUrl = null;
-
   const startVideo = async () => {
     console.log("playing video...")
+    rawVideo.current.play()
     video_in = rawVideo.current;
     await rawVideo.current.play().then(() => {
       transform()
+      console.log("object")
     })
 
 
   }
-
-  const stopVideo = () => {
-    console.log("Hanging up the call ...");
-    console.log(blob)
-
-  };
-
-  function readFile(file) {
-    console.log("readFile()=>", file);
-    return new Promise(function (resolve, reject) {
-      let fr = new FileReader();
-
-      fr.onload = function () {
-        resolve(fr.result);
-      };
-
-      fr.onerror = function () {
-        reject(fr);
-      };
-
-      fr.readAsDataURL(file);
-    });
-  }
-
-  const uploadVideo = async (base64) => {
-    console.log("uploading to backend...");
-    await readFile(blob).then((encoded_file) => {
-      console.log(encoded_file);
-      try {
-        fetch('/api/upload', {
-          method: 'POST',
-          body: JSON.stringify({ data: encoded_file }),
-          headers: { 'Content-Type': 'application/json' },
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            setLink(data.data);
-          });
-      } catch (error) {
-        console.error(error);
-      }
-    });
-  };
 
   let transform = () => {
     // let ;
@@ -161,6 +114,47 @@ export default function Home() {
     rec.onstop = e => setBlob(new Blob(chunks, { type: 'video/webm' }));
     rec.start();
     setTimeout(() => rec.stop(), 10000);
+  }
+
+  const stopVideo = () => {
+    console.log("Hanging up the call ...");
+    console.log(blob)
+
+  };
+  function readFile(file) {
+    console.log("readFile()=>", file);
+    return new Promise(function (resolve, reject) {
+      let fr = new FileReader();
+
+      fr.onload = function () {
+        resolve(fr.result);
+      };
+
+      fr.onerror = function () {
+        reject(fr);
+      };
+
+      fr.readAsDataURL(file);
+    });
+  }
+
+  const uploadVideo = async (base64) => {
+    console.log("uploading to backend...");
+    await readFile(blob).then((encoded_file) => {
+      try {
+        fetch('/api/upload', {
+          method: 'POST',
+          body: JSON.stringify({ data: encoded_file }),
+          headers: { 'Content-Type': 'application/json' },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setLink(data.data);
+          });
+      } catch (error) {
+        console.error(error);
+      }
+    });
   };
 
   return (
@@ -180,6 +174,7 @@ export default function Home() {
               autoPlay
               ref={rawVideo}
               loop
+              controls
             />
           </div>
           <div className="column">
@@ -196,7 +191,7 @@ export default function Home() {
           <button className="button" ref={startBtn} onClick={startVideo}>
             Process Video
           </button>
-          
+
           <button className="button" onClick={uploadVideo}>
             <a ref={videoDownloadRef}>
               Stop and upload
